@@ -29,7 +29,7 @@ app.use(session({
   secret: 'tonia', // Remplace par une clé secrète sécurisée
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
+  cookie: { secure: true } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
 }));
 
 /*
