@@ -1,0 +1,227 @@
+
+
+
+<%- include('layout/header') %>
+   <!-- Initialisation globale de la carte et de layerGroup -->
+ 
+ 
+<!-- Initialisation globale de la carte et des marqueurs -->
+<script defer>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initialiser la carte avec Leaflet
+    const map = L.map("map", { center: [43.2, 1.30], zoom: 7 });
+      // Initialisation de layerGroup
+    const layerGroup = L.featureGroup().addTo(map);
+
+    // Icônes personnalisées pour les marqueurs
+    const myIconGrey = L.icon({
+      iconSize: [25, 41],
+      iconAnchor: [10, 41],
+      popupAnchor: [2, -40],
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png'
+    });
+
+    const myIconBlue = L.icon({
+      iconSize: [25, 41],
+      iconAnchor: [10, 41],
+      popupAnchor: [2, -40],
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'
+    });
+
+    const myIconRed = L.icon({
+      iconSize: [25, 41],
+      iconAnchor: [10, 41],
+      popupAnchor: [2, -40],
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'
+    });
+
+    // Ajouter le fond de carte OpenStreetMap
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { 
+      preload: true,
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Ajouter un événement de clic sur la carte pour afficher les coordonnées
+    let myLocation = L.layerGroup().addTo(map);
+    map.addEventListener("click", function(e) {
+      myLocation.clearLayers();
+      L.marker(e.latlng).addTo(myLocation);
+
+      // Mettre à jour les champs cachés avec les coordonnées sélectionnées
+      document.getElementById('latitudeSelectioneeInput').value = e.latlng.lat;
+      document.getElementById('longitudeSelectioneeInput').value = e.latlng.lng;
+    });
+
+    // Vérifier si filteredUsers est défini et non vide    
+    if (filteredUsers && filteredUsers.length > 0) {
+     filteredUsers.forEach(user => {
+        const userIcon = icons[user.category];
+        const singleMarker = L.marker([user.latitudeSelectionee, user.longitudeSelectionee], { icon: userIcon, draggable: true });
+
+        singleMarker.bindPopup(
+          `<br><STRONG>${user.name}</STRONG></br>
+          <div class='flex-shrink-0 h-20 w-20'>
+            <img class='h-20 w-20 rounded-full' alt='' src="/uploads/${user.image}">
+          </div>${singleMarker.getLatLng()}`
+        ).openPopup();
+
+        layerGroup.addLayer(singleMarker);
+      });
+
+      // Centrer la carte sur les marqueurs ajoutés
+      map.fitBounds(layerGroup.getBounds());
+    }
+
+    // Gestion du bouton pour réinitialiser les marqueurs
+    const allMarker = document.getElementById("get-marker");
+    allMarker.addEventListener("click", () => {
+      layerGroup.clearLayers();
+    });
+  });
+</script>
+<h1>Home Page Content</h1>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta2/js/bootstrap.bundle.min.js" integrity="sha512-43iShtbiyImxjjU4a9rhXBy7eKtIsrpll8xKhe1ghKqh5NyfME8phZs5JRFZpRBe1si44WM3tNmnqMym7JRmDQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">  
+<nav>
+  <div class="container">
+ 
+    <a href="/users" class="navbar-brand"><i class="fas fa-code me-2"></i>Dendrobade maudit</a>
+    <button class="navbar-toggler" data-bs-target="#my-nav" data-bs-toggle="collapse" aria-control="my-nav" aria-expanded="false"
+    aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button> 
+    <div id="my-nav" class="collapse navbar-collapse">
+       <ul class="navbar-nav ms-auto">
+        <li  class="nav-item active">
+          <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Home</a>
+        </li>
+        <li  class="nav-item active">
+          <a class="nav-link" href="/addForm"><i class="fas fa-user-plus me-1"></i>Add User</a>
+        </li>
+        <li  class="nav-item active">
+          <a class="nav-link" href="#"><i class="fas fa-globe me-1"></i>About</a>
+        </li>
+        <li  class="nav-item active">
+          <a class="nav-link" href="#"><i class="fas fa-envelope me-1"></i>Contact</a>
+        </li>
+       </ul>
+
+    </div>
+  </div>
+</nav>
+</nav> 
+<button id="get-marker">VISUALISER LA ZONE</button>
+</div> 
+<!-- Div où la carte sera affichée -->
+<div id="map" style='width: 100%; height: 400px;'> </div>
+<!-- Map initialization script -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (filteredUsers && filteredUsers.length > 0) {
+      layerGroup.clearLayers();
+
+      const addLayers = (users, color, icon) => {
+        console.log("Adding layers for users:", users);
+        const latlngs = users.map(user => [user.latitudeSelectionee, user.longitudeSelectionee]);
+        const polyline = L.polyline(latlngs, { color });
+        layerGroup.addLayer(polyline);
+
+        users.forEach(user => {
+          const singleMarker = L.marker([user.latitudeSelectionee, user.longitudeSelectionee], { icon, draggable: true });
+          const popup = singleMarker.bindPopup(
+            `<br><STRONG>${user.name}</STRONG></br>
+            <div class='flex-shrink-0 h-20 w-20'>
+              <img class='h-20 w-20 rounded-full' alt='' src="/uploads/${user.image}">
+            </div>${singleMarker.getLatLng()}`
+          ).openPopup();
+          popup.addTo(map);
+          layerGroup.addLayer(singleMarker);
+        });
+      };
+
+      const colors = { "bon": 'blue', "moyen": 'grey', "bas": 'red' };  // Adjust based on categories
+      const icons = { "bon": myIconBlue, "moyen": myIconGrey, "bas": myIconRed };  // Ensure icons are defined
+
+      filteredUsers.forEach(user => {
+        //const userIcon = icons[user.category]; // Choisissez l'icône en fonction de la catégorie
+        addLayers([user], colors[user.category], icons[user.category]);
+ 
+        const singleMarker = L.marker([user.latitudeSelectionee, user.longitudeSelectionee], { icon: userIcon, draggable: true });
+
+        singleMarker.bindPopup(
+          `<br><STRONG>${user.name}</STRONG></br>
+          <div class='flex-shrink-0 h-20 w-20'>
+            <img class='h-20 w-20 rounded-full' alt='' src="/uploads/${user.image}">
+          </div>${singleMarker.getLatLng()}`
+        ).openPopup();
+
+        layerGroup.addLayer(singleMarker);
+      });
+       // Centrer la carte sur les marqueurs ajoutés
+       map.fitBounds(layerGroup.getBounds());
+
+    }
+  });
+</script>
+
+<div class='container'>
+  <div class="row my-4">
+    <div class="col-lg-12">     
+      <div class="table-responsive">
+        <% if (users && users.length > 0) { %>    
+        <table class="table table-striped text-center my-3">
+          <thead>
+            <tr class="table table-striped text">
+              <th>ID</th>
+              <th>Image</th>
+              <th>Name</th>
+              <th>E-Mail</th>
+              <th>Phone</th>
+              <th>LAT LNG</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>        
+            <% users.forEach((row, index) => { %>              
+              <tr class="align-middle">                
+                <td><%= index %></td>
+                <td><img src="/uploads/<%= row.image %>" width="50" class="img-thumbnail" /></td>
+                <td><%= row.name %></td>
+                <td><%= row.email %></td>
+                <td><%= row.phone %></td>
+                <td><%= row.latitudeSelectionee %>,<%= row.longitudeSelectionee %></td>
+                <td>
+                  <a href="/edit/<%= row._id %>" class="text-success"><i class="fas fa-edit fa-lg mx-1"></i></a>
+                  <a href="/delete/<%= row._id %>" class="text-danger"><i class="fas fa-trash fa-lg mx-1"></i></a>
+                </td>
+              </tr>
+                 <!-- Populating filteredUsers array for map visualization -->
+                 <script>
+                  if (typeof filteredUsers === 'undefined') var filteredUsers = [];
+                  filteredUsers.push({
+                    name: "<%= row.name %>",
+                    email: "<%= row.email %>",
+                    phone: "<%= row.phone %>",
+                    latitudeSelectionee: "<%= row.latitudeSelectionee %>",
+                    longitudeSelectionee: "<%= row.longitudeSelectionee %>",
+                    image: "<%= row.image %>",
+                    category: "<%= row.category %>" // Adjust based on user's category
+                  });
+                </script>
+            <% }) %>
+          </tbody>
+      </table>
+        <% } else { %>
+          <h1 class="text-center text-secondary mt-5">
+            No users found in the database!
+          </h1>
+          <% } %>
+      </div>
+    </div>
+  </div>
+
+
+   
+<%- include('layout/footer') %>
