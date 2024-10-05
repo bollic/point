@@ -29,7 +29,7 @@ app.use(session({
   secret: 'tonia', // Remplace par une clé secrète sécurisée
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: true } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
+  cookie: { secure: false } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
 }));
 
 /*
@@ -61,5 +61,8 @@ const utilisateurRouter = require("./routes/utilisateurs")
 app.use("/", articleRouter)
 app.use("/", utilisateurRouter)
 //app.use("/posts", postRouter)
-
-app.listen(4000)
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
+//app.listen(4000)
