@@ -5,6 +5,7 @@ const app = express();
 const mongoose = require('mongoose')
 const path = require('path');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 //import mongoose from "mongoose";
 //import connectDB from './connectDB/connectDB.js'
@@ -29,6 +30,9 @@ app.use(session({
   secret: 'tonia', // Remplace par une clé secrète sécurisée
   resave: false,
   saveUninitialized: true,
+  store: MongoStore.create({
+    mongoUrl: process.env.DATABASE_URL
+  }),
   cookie: { secure: true } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
 }));
 
