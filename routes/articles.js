@@ -87,6 +87,10 @@ router.get('/logout', (req, res) => {
     res.redirect('/'); // Rediriger vers la page articles après déconnexion
   });
 });
+
+
+
+
 // Middleware pour vérifier si l'utilisateur est connecté
 function isAuthenticated(req, res, next) {
   if (req.session && req.session.user) {
@@ -168,34 +172,42 @@ router.post("/ajoute_articles", upload, async(req, res) => {
 // delete a product
  // Assurez-vous que 'fs' est inclus
 
-router.get('/delete/:id',  async (req, res) => {
+router.get('/delete/:id', isAuthor, async (req, res) => {
   try {
    // Récupérer l'ID de l'article depuis les paramètres de l'URL
     const articleId = req.params.id;
-    console.log("req.params.id", req.params.id); // Per controllare se l'ID è corretto
+    //const userId = req.session.user._id;
+     const userId = req.session.user ? req.session.user._id : null;
+   
+     console.log("ID articolo:", articleId); // Per controllare se l'ID è corretto
+     console.log("ID utente:", userId);
 
+     let result;  // Dichiarare result all'esterno del blocco try
   
-   // Récupérer l'ID de l'utilisateur de la session
-  // const userId = req.session.user._id;
+     try {
     // Trouver l'article par ID et utilisateur loggé
-    const result = await Article.findOne({ _id: articleId});
-    console.log("articleId", articleId); // Per controllare se l'ID è corretto
-
+    const result = await Article.findOne({ _id: articleId,  user: userId });
+   
   // Vérifiez si l'article existe et appartient à l'utilisateur loggé
     if (!result) {
+      console.log("Articolo non trovato o non autorizzato");
       return res.status(404).send('Article non trouvé ou non autorisé à être supprimé');
     }
 
      // Supprimer l'article
      await Article.findByIdAndDelete(articleId)
-     
+    } catch (err) {
+      console.error('Errore MongoDB:', err);
+      res.status(500).send('Errore del server');
+    }  
       // Si l'article a une image associée, supprimer l'image
-      if (result.image) {
+      if (result && result.image) {  
+        // Controlla se l'immagine esiste
         // Construire le chemin de l'image
         const imagePath = './uploads/' + result.image;
 
-        // Supprimer le fichier image de manière synchrone
-        try {
+      // Supprimer le fichier image de manière synchrone
+         try {
           fs.unlinkSync(imagePath);
           console.log('Image supprimée avec succès');
         } catch (err) {
