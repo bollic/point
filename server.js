@@ -11,8 +11,8 @@ const MongoStore = require('connect-mongo');
 //import connectDB from './connectDB/connectDB.js'
 
 mongoose.connect(process.env.DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+   // useNewUrlParser: true,
+   // useUnifiedTopology: true
     })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
