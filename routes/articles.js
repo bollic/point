@@ -168,7 +168,7 @@ router.post("/ajoute_articles", upload, async(req, res) => {
 // delete a product
  // Assurez-vous que 'fs' est inclus
 
-router.get('/delete/:id', isAuthenticated, async (req, res) => {
+router.get('/delete/:id',  async (req, res) => {
   try {
    // Récupérer l'ID de l'article depuis les paramètres de l'URL
     const articleId = req.params.id;

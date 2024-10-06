@@ -33,7 +33,9 @@ app.use(session({
   store: MongoStore.create({
     mongoUrl: process.env.DATABASE_URL
   }),
-  cookie: { secure: true } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
+  cookie: { secure: process.env.NODE_ENV === 'production' } // Solo su HTTPS in produzione
+
+ // cookie: { secure: true } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
 }));
 
 app.use((req, res, next) => {
