@@ -172,10 +172,15 @@ router.get('/delete/:id',  async (req, res) => {
   try {
    // Récupérer l'ID de l'article depuis les paramètres de l'URL
     const articleId = req.params.id;
+    console.log("req.params.id", req.params.id); // Per controllare se l'ID è corretto
+
+  
    // Récupérer l'ID de l'utilisateur de la session
-   const userId = req.session.user._id;
+  // const userId = req.session.user._id;
     // Trouver l'article par ID et utilisateur loggé
-    const result = await Article.findOne({ _id: articleId, user: userId });
+    const result = await Article.findOne({ _id: articleId});
+    console.log("articleId", articleId); // Per controllare se l'ID è corretto
+
   // Vérifiez si l'article existe et appartient à l'utilisateur loggé
     if (!result) {
       return res.status(404).send('Article non trouvé ou non autorisé à être supprimé');
