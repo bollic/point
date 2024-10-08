@@ -29,17 +29,16 @@ app.use(express.json())
 app.use(session({
   secret: 'tonia', // Remplace par une clé secrète sécurisée
   resave: false,
-  saveUninitialized: true,
-  cookie: {
-    secure: true,
-     secure: process.env.NODE_ENV === 'production',
-     maxAge: 1000 * 60 * 60 * 24,  // Durata del cookie (1 giorno)
-     httpOnly: true,  // Impedisci l'accesso ai cookie tramite JavaScript client
-
-    }, // Solo su HTTPS in produzione
-    store: MongoStore.create({
+  saveUninitialized: true, 
+  store: MongoStore.create({
       mongoUrl: process.env.DATABASE_URL
-    }),
+  }),
+  cookie: { 
+    secure: false, // Imposta su 'false' per testare senza HTTPS
+
+  // secure: process.env.NODE_ENV === 'production',
+   httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 }, // Imposta il cookie per 24 ore
  //cookie: { secure: false } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
 }));
 console.log('Ambiente di esecuzione:', process.env.NODE_ENV);
