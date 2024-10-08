@@ -93,9 +93,14 @@ router.get('/logout', (req, res) => {
 
 // Middleware pour vérifier si l'utilisateur est connecté
 function isAuthenticated(req, res, next) {
+   // Log per vedere cosa contiene la sessione
+   console.log("Verifica autenticazione - sessione utente:", req.session ? req.session.user : "Nessuna sessione");
+
   if (req.session && req.session.user) {
     return next(); // Si l'utilisateur est connecté, continuer l'exécution
   } else {
+     // Log per vedere se l'utente non è autenticato e viene reindirizzato al login
+     console.log("Utente non autenticato, reindirizzamento a /login");
     req.session.redirectTo = req.originalUrl;
     return res.redirect('/login'); // Sinon, rediriger vers la page de login
   }
@@ -129,18 +134,22 @@ async function isAuthor(req, res, next) {
 //VADO A: qs e' l indirizzo web , cioe la ROUTE addForm, che vedo nell'internet
 // Links http://localhost:4000/addForm
 router.get("/addForm", isAuthenticated, (req, res) => {
-  //il file ejs corrisponente alla route addForm e' il seguente add_users, che corrisponde a add_users.ejs
-  // Assicurati che req.session.user esista
-  //post e render inviano a add_users
+  // Log per vedere se l'utente è stato autenticato correttamente e cosa contiene la sessione
+  console.log("Accesso a /addForm - sessione utente:", req.session ? req.session.user : "Nessuna sessione");
+
   if (req.session.user) {
   res.render("ajoute_articles", { title: 'Article Form Page', user: req.session.user});
   
 } else {
+    // Log per verificare se si viene reindirizzati al login
+    console.log("Utente non autenticato, reindirizzamento a /login");
   res.redirect("/login");  // Se l'utente non è loggato, reindirizza alla pagina di login
 }
 });
 router.post("/ajoute_articles", upload, async(req, res) => {
-  console.log(req.body);  // Verifica che req.body.id sia presente
+  // Log del corpo della richiesta e della sessione
+  console.log("Dati del form ricevuti:", req.body);
+  console.log("Sessione utente:", req.session ? req.session.user : "Nessuna sessione");
   const articles = new Article({
  
     utilisateur: req.body.id,
@@ -161,9 +170,9 @@ router.post("/ajoute_articles", upload, async(req, res) => {
      
     }
     res.redirect('/');
-    console.log(req.session.message)
+    console.log("Articolo aggiunto con successo:", req.session.message)
   } catch (err) {
-    console.error(err);
+    console.error("Errore durante l'aggiunta dell'articolo:", err);
     res.status(500).send('Erreur lors de l enregistrement de l utilisateur');
   }
  
