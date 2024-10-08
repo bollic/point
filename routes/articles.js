@@ -24,12 +24,16 @@ router.post('/login', async (req, res) => {
       console.log('Utilisateur trouvé:', user);
 
       if (bcrypt.compareSync(password, user.password)) {
-        // Authentification réussie
-        req.session.user = user; // Stocker les informations utilisateur dans la session
+             // Authentification réussie
+        // Stocker seulement l'ID et l'email de l'utilisateur dans la session
+        req.session.user = {
+          _id: user._id,
+          email: user.email
+        }; // Stocker les informations utilisateur dans la session
         const redirectTo = req.session.redirectTo || '/';
      delete req.session.redirectTo;  // Elimina la variabile di sessione dopo il reindirizzamento
     
-     console.log(redirectTo)
+     console.log('Redirection vers:', redirectTo)
      // Redirige alla route originaria o a '/utilisateurs'
     res.redirect(redirectTo);
       
@@ -135,7 +139,7 @@ async function isAuthor(req, res, next) {
 // Links http://localhost:4000/addForm
 router.get("/addForm", isAuthenticated, (req, res) => {
   // Log per vedere se l'utente è stato autenticato correttamente e cosa contiene la sessione
-  console.log("Accesso a /addForm - sessione utente:", req.session ? req.session.user : "Nessuna sessione");
+  console.log("Accesso a /addForm - sessione utente:", req.session ? req.session.user._id : "Nessuna sessione");
 
   if (req.session.user) {
   res.render("ajoute_articles", { title: 'Article Form Page', user: req.session.user});

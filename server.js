@@ -9,7 +9,7 @@ const MongoStore = require('connect-mongo');
 
 //import mongoose from "mongoose";
 //import connectDB from './connectDB/connectDB.js'
-
+//         mongodb+srv://soniaBoss:KLP59dnH8@cluster0.cvr9g5a.mongodb.net/?retryWrites=true&w=majority
 mongoose.connect(process.env.DATABASE_URL, {
    // useNewUrlParser: true,
    // useUnifiedTopology: true
@@ -30,13 +30,19 @@ app.use(session({
   secret: 'tonia', // Remplace par une clé secrète sécurisée
   resave: false,
   saveUninitialized: true,
-  store: MongoStore.create({
-    mongoUrl: process.env.DATABASE_URL
-  }),
-  cookie: { secure: process.env.NODE_ENV === 'production' } // Solo su HTTPS in produzione
+  cookie: {
+    secure: true,
+     secure: process.env.NODE_ENV === 'production',
+     maxAge: 1000 * 60 * 60 * 24,  // Durata del cookie (1 giorno)
+     httpOnly: true,  // Impedisci l'accesso ai cookie tramite JavaScript client
 
- // cookie: { secure: true } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
+    }, // Solo su HTTPS in produzione
+    store: MongoStore.create({
+      mongoUrl: process.env.DATABASE_URL
+    }),
+ //cookie: { secure: false } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
 }));
+console.log('Ambiente di esecuzione:', process.env.NODE_ENV);
 
 app.use((req, res, next) => {
     res.locals.message = req.session.message;
