@@ -35,9 +35,8 @@ app.use(session({
   }),
   cookie: { 
     secure: false, // Imposta su 'false' per testare senza HTTPS
-
   // secure: process.env.NODE_ENV === 'production',
-   httpOnly: true,
+    httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 }, // Imposta il cookie per 24 ore
  //cookie: { secure: false } // 'false' pour le développement, à passer à 'true' en production avec HTTPS
 }));

@@ -1,11 +1,9 @@
 <%- include('layout/header') %>
 
-<h1>Le dendrobate</h1>
-
 <!-- Add Bootstrap JS for functionality -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta2/js/bootstrap.bundle.min.js" integrity="sha512-43iShtbiyImxjjU4a9rhXBy7eKtIsrpll8xKhe1ghKqh5NyfME8phZs5JRFZpRBe1si44WM3tNmnqMym7JRmDQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+
   <div class="container">
     <a href="/utilisateurs" class="navbar-brand"><i class="fas fa-code me-2"></i>Dendrobade maudit</a>
     <button class="navbar-toggler" data-bs-target="#my-nav" data-bs-toggle="collapse" aria-controls="my-nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,16 +35,27 @@
       </ul>
     </div>
   </div>
+
 </nav>
 
-<div id="map" style='width: 100%; height: 300px; display: none;'></div>
-<div class="text-center my-3">
-  <button id="toggle-map" class="navbar-toggler">Mostra mappa</button>
-</div>
-
+<div class="container my-3">
+  <div class="row">
+    <div class="col-12 text-center">
+      <!-- Pulsante per visualizzare la mappa -->
+      <button id="toggle-map" class="btn btn-primary">Visualiser la carte</button>
+    </div>
+  </div>
+ 
+  <!-- Mappa -->
+  <div id="map-container" style="overflow: hidden; height: 0; opacity: 0; transition: height 0.5s ease, opacity 0.5s ease;">
+    <div id="map" style="width: 100%; height: 300px;"></div>
+  </div>
+  
 <div class='container'>
   <div class="row my-4">
     <div class="col-lg-12">
+       <!-- Pulsante per visualizzare la mappa -->
+    
       <% if (message) { %> 
         <div class="alert alert-dismissible fade show alert-<%= message.type %>" role="alert">
           <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -127,113 +136,96 @@
 <!-- Map Initialization Script -->
 <script defer>
   document.addEventListener("DOMContentLoaded", function() {
-    let map; // Declare map variable outside the event listener
-    let layerGroup; // Declare layerGroup variable outside the event listener
+    let map;
+    let layerGroup;
 
-      // Function to initialize the map
-function initializeMap() {
-  // Initialize the map once
-     map = L.map("map", { center: [43.2, 1.30], zoom: 10 });
-     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { 
-      maxZoom: 19,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-     // Initialize a feature group to hold markers
-     layerGroup = L.featureGroup().addTo(map);
+    // Function to initialize the map
+    function initializeMap() {
+      map = L.map("map", { center: [43.2, 1.30], zoom: 10 });
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
 
-    const icons = {
-      "bon": L.icon({
-        iconSize: [25, 41],
-        iconAnchor: [10, 41],
-        popupAnchor: [2, -40],
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'
-      }),
-      "moyen": L.icon({
-        iconSize: [25, 41],
-        iconAnchor: [10, 41],
-        popupAnchor: [2, -40],
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png'
-      }),
-      "bas": L.icon({
-        iconSize: [25, 41],
-        iconAnchor: [10, 41],
-        popupAnchor: [2, -40],
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'
-      })
-    };
+      layerGroup = L.featureGroup().addTo(map);
 
-    if (typeof filteredUsers !== 'undefined' && filteredUsers.length > 0) {
-      filteredUsers.forEach(user => {
-        const lat = parseFloat(user.latitudeSelectionee); // Pas de toFixed() pour conserver la précision
-         const lng = parseFloat(user.longitudeSelectionee); // Pas de toFixed() pour conserver la précision
-        const userIcon = icons[user.category] || icons['moyen']; // Par défaut 'moyen' si catégorie inconnue
+      const icons = {
+        "bon": L.icon({
+          iconSize: [25, 41],
+          iconAnchor: [10, 41],
+          popupAnchor: [2, -40],
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'
+        }),
+        "moyen": L.icon({
+          iconSize: [25, 41],
+          iconAnchor: [10, 41],
+          popupAnchor: [2, -40],
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png'
+        }),
+        "bas": L.icon({
+          iconSize: [25, 41],
+          iconAnchor: [10, 41],
+          popupAnchor: [2, -40],
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'
+        })
+      };
 
-    // Créer un marqueur pour chaque utilisateur
-    const singleMarker = L.marker([lat, lng], { icon: userIcon, draggable: true });
-          // Attacher une popup au marqueur
-        singleMarker.bindPopup(
-          `<br><strong>${user.name}</strong></br>
-          <br><strong>${user.category}</strong></br>
-      <div class='flex-shrink-0 h-20 w-20'>
-        <img class='h-20 w-20 rounded-full' alt='' src="/uploads/${user.image}">
-      </div> 
-   `
-        ).openPopup();
+      if (typeof filteredUsers !== 'undefined' && filteredUsers.length > 0) {
+        filteredUsers.forEach(user => {
+          const lat = parseFloat(user.latitudeSelectionee);
+          const lng = parseFloat(user.longitudeSelectionee);
+          const userIcon = icons[user.category] || icons['moyen'];
 
-        layerGroup.addLayer(singleMarker);
-      });
-       // Ajuster la vue pour inclure tous les marqueurs uniquement s'il y a des marqueurs
-       if (layerGroup.getLayers().length > 0) {
-        map.fitBounds(layerGroup.getBounds()); // Ajuster la carte aux limites des marqueurs
+          const singleMarker = L.marker([lat, lng], { icon: userIcon, draggable: true });
+          singleMarker.bindPopup(
+            `<br><strong>${user.name}</strong></br>
+            <br><strong>${user.category}</strong></br>
+            <div class='flex-shrink-0 h-20 w-20'>
+              <img class='h-20 w-20 rounded-full' alt='' src="/uploads/${user.image}">
+            </div>`
+          ).openPopup();
+
+          layerGroup.addLayer(singleMarker);
+        });
+
+        if (layerGroup.getLayers().length > 0) {
+          map.fitBounds(layerGroup.getBounds());
         }
+      }
+
+      const exampleMarker = L.marker([43.2, 1.30]).addTo(layerGroup);
+      exampleMarker.bindPopup('<b>Hello world!</b><br>I am a popup.');
     }
 
-   // Example static marker
-   const exampleMarker = L.marker([43.2, 1.30]).addTo(layerGroup);
-    exampleMarker.bindPopup('<b>Hello world!</b><br>I am a popup.');
-   }
-     // Initialize the map
-  initializeMap();
-   // Function to handle map visibility
-   function toggleMap() {
-   
-    
-      const mapElement = document.getElementById('map');
-      const toggleButton = document.getElementById('toggle-map');
+    // Funzione per gestire la visibilità della mappa
+    function toggleMap() {
+      const mapContainer = document.getElementById("map-container");
+      const toggleButton = document.getElementById("toggle-map");
 
-      if (mapElement.style.display === 'none') {
-        mapElement.style.display = 'block';
+      if (mapContainer.style.height === "0px" || mapContainer.style.opacity === "0") {
+        mapContainer.style.height = "300px";
+        mapContainer.style.opacity = "1";
         toggleButton.textContent = 'Efface la carte';
 
-        // Initialize map if not already initialized
         if (!map) {
           initializeMap();
           setTimeout(() => {
-            map.invalidateSize(); // Ensure map is resized
-            map.fitBounds(layerGroup.getBounds()); // Fit map to markers
-          }, 100); // Short delay to ensure rendering
+            map.invalidateSize();
+            map.fitBounds(layerGroup.getBounds());
+          }, 100);
         } else {
-          map.invalidateSize(); // Ensure map is resized
-          map.fitBounds(layerGroup.getBounds()); // Fit map to markers
+          map.invalidateSize();
+          map.fitBounds(layerGroup.getBounds());
         }
       } else {
-        mapElement.style.display = 'none';
-        toggleButton.textContent = 'Visualise la carte';
+        mapContainer.style.height = "0";
+        mapContainer.style.opacity = "0";
+        toggleButton.textContent = 'Visualiser la carte';
       }
     }
 
-    // Attach event listener to toggle button
-    document.getElementById('toggle-map').addEventListener('click', toggleMap);
-  
-
-    });
+    document.getElementById("toggle-map").addEventListener("click", toggleMap);
+  });
 </script>
 
 
-<!-- Map container -->
-<div id="map" style="width: 100%; height: 300px; display: none;"></div>
-
-<!-- Toggle Button -->
-<div class="text-center my-3">
-  <button id="toggle-map" class="btn btn-primary">Mostra mappa</button>
-</div>
