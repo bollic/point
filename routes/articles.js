@@ -59,7 +59,9 @@ var storage = multer.diskStorage({
     cb(null, './uploads');
   },
   filename: function(req, file, cb){
-    cb(null, file.fieldname+"_"+Date.now()+"_"+file.originalname)
+   // cb(null, file.fieldname+"_"+Date.now()+"_"+file.originalname)
+   cb(null, file.originalname)
+
   },
 });
 
@@ -222,6 +224,8 @@ router.get('/delete/:id', isAuthor, async (req, res) => {
       // Supprimer le fichier image de manière synchrone
          try {
           fs.unlinkSync(imagePath);
+        const imagePath = './uploads/' + result.image;
+          console.log(imagePath);
           console.log('Image supprimée avec succès');
         } catch (err) {
           console.error('Erreur lors de la suppression de l\'image:', err);
@@ -264,27 +268,28 @@ router.get("/edit/:id", isAuthenticated, isAuthor, async(req, res) => {
     console.error('Erreur lors de la suppression de l\'article:', err);
     res.status(500).send('Erreur lors de la suppression de l\'article');
   }
-
 });
 
 router.post("/edit/:id", upload, async (req, res) => {
   try {
     let id = req.params.id;
-
+    console.log("ID dell'articolo passato:", req.params.id);
+    //image: req.file.filename,
     // Trouver l'utilisateur par son ID
     let article = await Article.findById(id);
+    console.log("Articolo passato:", req.params.id);
 
     if (article) {
       // Mettre à jour les informations de l'utilisateur
       article.name = req.body.name;
       article.latitudeSelectionee = req.body.latitudeSelectionee;
       article.longitudeSelectionee = req.body.longitudeSelectionee;
-
-
+      article.image = req.body.image
       // Vérifiez si une nouvelle image a été uploadée
       if (req.file) {
         // Supprimer l'ancienne image si elle existe
         if (article.image) {
+          console.log(article.image)
           const oldImagePath = './uploads/' + article.image;
           try {
             fs.unlinkSync(oldImagePath);
@@ -293,7 +298,6 @@ router.post("/edit/:id", upload, async (req, res) => {
             console.error('Erreur lors de la suppression de l\'ancienne image:', err);
           }
         }
-
         // Mettre à jour le chemin de la nouvelle image
         article.image = req.file.filename;
       }
