@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt'); // Utilisé pour comparer les mots de passe ha
 
 const mongoose = require('mongoose');
 const Article = require('../models/articles');
-const Signup = require('../models/utilisateurs');
+const User = require('../models/utilisateurs');
 
 const multer = require('multer');
 router.use(logger);
@@ -18,7 +18,7 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await Signup.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (user) {
       console.log('Utilisateur trouvé:', user);
@@ -77,7 +77,7 @@ router.get('/', async (req, res) => {
         
         // Rendre la page avec les articles et l'utilisateur connecté
         res.render('index',  {
-            title:'la liste des articles',
+            title:'la liste des points',
               session: req.session, // Passer la session à la vue
               user: req.session ? req.session.user : null, // Vérifiez si un utilisateur est connecté, sinon null
               // id: userId,
@@ -284,7 +284,7 @@ router.post("/edit/:id", upload, async (req, res) => {
       article.name = req.body.name;
       article.latitudeSelectionee = req.body.latitudeSelectionee;
       article.longitudeSelectionee = req.body.longitudeSelectionee;
-      article.image = req.body.image
+     // article.image = req.file.filename
       // Vérifiez si une nouvelle image a été uploadée
       if (req.file) {
         // Supprimer l'ancienne image si elle existe

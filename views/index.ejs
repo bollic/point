@@ -10,7 +10,8 @@
   </div>
  
   <!-- Mappa -->
-  <div id="map" style='width: 100%; height: 300px; display: none; transition: all 0.3s ease-in-out'></div>
+  <div id="map" style='width: 100%; height: 300px; display: none; transition: all 0.3s ease-in-out'>
+  </div>
 </div>
 <div class='container'>
   <div class="row my-4">
@@ -23,7 +24,6 @@
           <i class="fas fa-exclamation-circle me-2"></i>   
           <strong><%= message.message %></strong>     
         </div>
-
              <% } %>
 
       <div class="table-responsive">
@@ -69,8 +69,7 @@
                   if (typeof filteredUsers === 'undefined') var filteredUsers = [];
                   filteredUsers.push({
                     name: "<%= row.name %>",
-                    email: "<%= row.email %>",
-                    
+                    email: "<%= row.email %>",                    
                     latitudeSelectionee: "<%= row.latitudeSelectionee %>",
                     longitudeSelectionee: "<%= row.longitudeSelectionee %>",
                     image: "<%= row.image %>",
@@ -88,11 +87,8 @@
   </div>
 </div>
 
-<%- include('layout/footer') %>
-
 <!-- Leaflet JS and CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <!-- Map Initialization Script -->
 <script defer>
@@ -133,19 +129,19 @@ function initializeMap() {
     };
 
     if (typeof filteredUsers !== 'undefined' && filteredUsers.length > 0) {
-      filteredUsers.forEach(user => {
-        const lat = parseFloat(user.latitudeSelectionee); // Pas de toFixed() pour conserver la précision
-         const lng = parseFloat(user.longitudeSelectionee); // Pas de toFixed() pour conserver la précision
-        const userIcon = icons[user.category] || icons['moyen']; // Par défaut 'moyen' si catégorie inconnue
+      filteredUsers.forEach(article => {
+        const lat = parseFloat(article.latitudeSelectionee); // Pas de toFixed() pour conserver la précision
+         const lng = parseFloat(article.longitudeSelectionee); // Pas de toFixed() pour conserver la précision
+        const userIcon = icons[article.category] || icons['moyen']; // Par défaut 'moyen' si catégorie inconnue
 
     // Créer un marqueur pour chaque utilisateur
     const singleMarker = L.marker([lat, lng], { icon: userIcon, draggable: true });
           // Attacher une popup au marqueur
         singleMarker.bindPopup(
-          `<br><strong>${user.name}</strong></br>
-          <br><strong>${user.category}</strong></br>
+          `<br><strong>${article.name}</strong></br>
+          <br><strong>${article.category}</strong></br>
       <div class='flex-shrink-0 h-20 w-20'>
-        <img class='h-20 w-20 rounded-full' alt='' src="/uploads/${user.image}">
+        <img class='h-20 w-20 rounded-full' alt='' src="/uploads/${article.image}">
       </div> 
    `
         ).openPopup();
@@ -199,6 +195,4 @@ function initializeMap() {
     });
 </script>
 
-
-<!-- Map container -->
-<div id="map" style="width: 100%; height: 300px; display: none;"></div>
+<%- include('layout/footer') %>

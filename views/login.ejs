@@ -1,15 +1,28 @@
-<form action="/login" method="post">
-    <div>
-      <label for="email">Email:</label>
-      <input type="email" name="email" id="email" >
+<%- include('layout/header') %>
+<div class="col-md-4 col-sm-6 mx-auto mt-5">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white text-center">
+      <h3>Se connecter</h3>
     </div>
-    <div>
-      <label for="password">Password:</label>
-      <input type="password" name="password" id="password" >
+
+  <div class="card-body p-3">
+  <form action="/login" method="post">
+    <div class="mb-2">
+      <label for="email" class="form-label">Email:</label>
+      <input type="email" class="form-control" name="email" id="email" >
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password:</label>
+      <input type="password" class="form-control" name="password" id="password" >
     </div>
     <% if (error) { %>
-      <p style="color: red;"><%= error %></p>
+      <div class="alert alert-danger">
+        <%= error %>
+      </div>
     <% } %>
-    <button type="submit">Se connecter</button>
+    <button type="submit" class="btn btn-primary w-100">Se connecter</button>
   </form>
-  
+  </div>
+</div>
+</div>
+  <%- include('layout/footer') %>

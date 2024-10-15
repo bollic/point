@@ -24,10 +24,10 @@
     Latitude: ${lat}, Longitude: ${lng}
     `).openPopup();
     // Se vuoi aggiornare latitudine e longitudine spostando il marker
-    marker.on('dragend', function(e) {
+    marker.on('dragend', 'onClick', function(e) {
         const newLatLng = e.target.getLatLng();
-        document.getElementById('latitudeSelectioneeInput').value = newLatLng.lat.toFixed(6);
-        document.getElementById('longitudeSelectioneeInput').value = newLatLng.lng.toFixed(6);
+        document.getElementById('latitudeSelectioneeInput').value = newLatLng.lat;
+        document.getElementById('longitudeSelectioneeInput').value = newLatLng.lng;
      });
 
  
@@ -53,8 +53,8 @@
         // Evento 'submit' per aggiornare i campi lat/long prima dell'invio del form
         document.getElementById('add-form').addEventListener('submit', function(event) {
             // Recupera i nuovi valori del marker
-            let newLat = marker.getLatLng().lat.toFixed(6);
-            let newLng = marker.getLatLng().lng.toFixed(6);
+            let newLat = marker.getLatLng().lat;
+            let newLng = marker.getLatLng().lng;
             
             // Imposta i valori nei campi nascosti
             document.getElementById('latitudeSelectioneeInput').value = newLat;
